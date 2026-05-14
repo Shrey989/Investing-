@@ -8,31 +8,26 @@ export async function GET() {
       "INFY.NS",
     ];
 
-    const results = await Promise.all(
-      symbols.map(async (symbol) => {
-        const response = await fetch(
-          `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
-          {
-            headers: {
-              "User-Agent":
-                "Mozilla/5.0",
-            },
-            cache: "no-store",
-          }
-        );
+    const requests = symbols.map(async (symbol) => {
+      const response = await fetch(
+        `https://financialmodelingprep.com/api/v3/quote/${symbol}?apikey=demo`,
+        {
+          cache: "no-store",
+        }
+      );
 
-        const data = await response.json();
+      const data = await response.json();
 
-        const result = data.chart.result[0];
+      const stock = data[0];
 
-        return {
-          symbol,
-          price: result.meta.regularMarketPrice,
-          change: result.meta.regularMarketPrice
-            - result.meta.previousClose,
-        };
-      })
-    );
+      return {
+        symbol,
+        price: stock?.price || null,
+        change: stock?.changesPercentage || null,
+      };
+    });
+
+    const results = await Promise.all(requests);
 
     return Response.json(results);
   } catch (error) {
