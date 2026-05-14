@@ -1,5 +1,3 @@
-import yahooFinance from "yahoo-finance2";
-
 export async function GET() {
   try {
     const symbols = [
@@ -10,17 +8,26 @@ export async function GET() {
       "INFY.NS",
     ];
 
-    const results = await Promise.all(
-      symbols.map(async (symbol) => {
-        const quote = await yahooFinance.quote(symbol);
+    const requests = symbols.map(async (symbol) => {
+      const res = await fetch(
+        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`,
+        {
+          cache: "no-store",
+        }
+      );
 
-        return {
-          symbol,
-          price: quote.regularMarketPrice,
-          change: quote.regularMarketChangePercent,
-        };
-      })
-    );
+      const data = await res.json();
+
+      const quote = data.quoteResponse.result[0];
+
+      return {
+        symbol,
+        price: quote.regularMarketPrice,
+        change: quote.regularMarketChangePercent,
+      };
+    });
+
+    const results = await Promise.all(requests);
 
     return Response.json(results);
   } catch (error) {
