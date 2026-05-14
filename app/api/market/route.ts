@@ -5,7 +5,7 @@ export async function GET() {
       "SIEMENS.NS",
       "POWERGRID.NS",
       "TATAMOTORS.NS",
-      "INFY.NS",
+      "AAPL",
     ];
 
     const requests = symbols.map(async (symbol) => {
