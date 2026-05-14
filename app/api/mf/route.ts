@@ -1,3 +1,7 @@
+function calculateReturn(current: number, previous: number) {
+  return (((current - previous) / previous) * 100).toFixed(2);
+}
+
 export async function GET() {
   try {
     const funds = [
@@ -38,10 +42,26 @@ export async function GET() {
 
         const data = await response.json();
 
+        const navs = data.data;
+
+        const latest = parseFloat(navs[0].nav);
+
+        const week = parseFloat(navs[7]?.nav || navs[0].nav);
+
+        const month = parseFloat(navs[30]?.nav || navs[0].nav);
+
+        const threeMonth = parseFloat(navs[90]?.nav || navs[0].nav);
+
         return {
           name: fund.name,
-          nav: data.data?.[0]?.nav || "N/A",
-          date: data.data?.[0]?.date || "N/A",
+          nav: latest.toFixed(2),
+          date: navs[0].date,
+
+          oneWeek: calculateReturn(latest, week),
+
+          oneMonth: calculateReturn(latest, month),
+
+          threeMonth: calculateReturn(latest, threeMonth),
         };
       })
     );
