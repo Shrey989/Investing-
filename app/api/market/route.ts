@@ -1,11 +1,12 @@
 export async function GET() {
   try {
     const symbols = [
-      "HDFCBANK.NS",
-      "SIEMENS.NS",
-      "POWERGRID.NS",
-      "TATAMOTORS.NS",
-      "AAPL",
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "GOOGL",
+  "AMZN",
+];
     ];
 
     const requests = symbols.map(async (symbol) => {
