@@ -8,32 +8,43 @@ export async function GET() {
       "INFY.NS",
     ];
 
-    const requests = symbols.map(async (symbol) => {
-      const res = await fetch(
-        `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`,
-        {
-          cache: "no-store",
-        }
-      );
+    const results = await Promise.all(
+      symbols.map(async (symbol) => {
+        const response = await fetch(
+          `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
+          {
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0",
+            },
+            cache: "no-store",
+          }
+        );
 
-      const data = await res.json();
+        const data = await response.json();
 
-      const quote = data.quoteResponse.result[0];
+        const result = data.chart.result[0];
 
-      return {
-        symbol,
-        price: quote.regularMarketPrice,
-        change: quote.regularMarketChangePercent,
-      };
-    });
-
-    const results = await Promise.all(requests);
+        return {
+          symbol,
+          price: result.meta.regularMarketPrice,
+          change: result.meta.regularMarketPrice
+            - result.meta.previousClose,
+        };
+      })
+    );
 
     return Response.json(results);
   } catch (error) {
+    console.error(error);
+
     return Response.json(
-      { error: "Failed to fetch market data" },
-      { status: 500 }
+      {
+        error: "Failed to fetch market data",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
