@@ -94,6 +94,33 @@ export default function Dashboard() {
     },
   ];
 
+  const macro = [
+    {
+      name: "Nifty",
+      value: "24,180",
+      change: "+0.62%",
+      positive: true,
+    },
+    {
+      name: "Sensex",
+      value: "79,420",
+      change: "+0.54%",
+      positive: true,
+    },
+    {
+      name: "India VIX",
+      value: "15.2",
+      change: "-2.1%",
+      positive: false,
+    },
+    {
+      name: "Brent",
+      value: "$84",
+      change: "+1.8%",
+      positive: false,
+    },
+  ];
+
   const cardStyle: React.CSSProperties = {
     background: "linear-gradient(180deg,#3a3d42 0%, #33363b 100%)",
     borderRadius: "28px",
@@ -143,6 +170,50 @@ export default function Dashboard() {
           </div>
         </div>
 
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "14px",
+            marginBottom: "28px",
+          }}
+        >
+          {macro.map((item) => (
+            <div key={item.name} style={cardStyle}>
+              <div
+                style={{
+                  color: "#a8a29a",
+                  fontSize: "14px",
+                }}
+              >
+                {item.name}
+              </div>
+
+              <div
+                style={{
+                  marginTop: "14px",
+                  fontSize: "34px",
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                }}
+              >
+                {item.value}
+              </div>
+
+              <div
+                style={{
+                  marginTop: "10px",
+                  color: item.positive ? "#8fd6a3" : "#ff8d8d",
+                  fontSize: "15px",
+                  fontWeight: 500,
+                }}
+              >
+                {item.change}
+              </div>
+            </div>
+          ))}
+        </div>
+
         <SectionTitle title="Market Commentary" />
 
         <div style={{ ...cardStyle, lineHeight: 1.7 }}>
@@ -186,6 +257,7 @@ export default function Dashboard() {
                     style={{
                       fontSize: "22px",
                       fontWeight: 600,
+                      lineHeight: 1.2,
                     }}
                   >
                     {fund.name}
@@ -216,13 +288,38 @@ export default function Dashboard() {
 
                   <div
                     style={{
-                      fontSize: "28px",
+                      fontSize: "30px",
                       fontWeight: 600,
+                      letterSpacing: "-0.04em",
                     }}
                   >
                     ₹{fund.nav}
                   </div>
                 </div>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginTop: "20px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <PerformancePill
+                  label="1W"
+                  value={fund.oneWeek}
+                />
+
+                <PerformancePill
+                  label="1M"
+                  value={fund.oneMonth}
+                />
+
+                <PerformancePill
+                  label="3M"
+                  value={fund.threeMonth}
+                />
               </div>
             </div>
           ))}
@@ -322,6 +419,43 @@ function Pill({ text, negative = false }: any) {
   );
 }
 
+function PerformancePill({ label, value }: any) {
+  const positive = parseFloat(value) >= 0;
+
+  return (
+    <div
+      style={{
+        background: "rgba(255,255,255,0.05)",
+        padding: "12px 16px",
+        borderRadius: "999px",
+        display: "flex",
+        gap: "8px",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          color: "#8f8981",
+          fontSize: "13px",
+        }}
+      >
+        {label}
+      </div>
+
+      <div
+        style={{
+          color: positive ? "#8fd6a3" : "#ff8d8d",
+          fontSize: "14px",
+          fontWeight: 600,
+        }}
+      >
+        {positive ? "+" : ""}
+        {value}%
+      </div>
+    </div>
+  );
+}
+
 function WatchCard({ item, label, cardStyle }: any) {
   return (
     <div style={cardStyle}>
@@ -400,4 +534,4 @@ function WatchCard({ item, label, cardStyle }: any) {
       </div>
     </div>
   );
-}
+              }
