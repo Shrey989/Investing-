@@ -2,31 +2,65 @@ function calculateReturn(current: number, previous: number) {
   return (((current - previous) / previous) * 100).toFixed(2);
 }
 
+function parseDate(dateStr: string) {
+  const [day, month, year] = dateStr.split("-").map(Number);
+
+  return new Date(year, month - 1, day);
+}
+
+function findClosestNAV(data: any[], targetDays: number) {
+  const today = parseDate(data[0].date);
+
+  const targetDate = new Date(today);
+
+  targetDate.setDate(today.getDate() - targetDays);
+
+  let closest = data[0];
+
+  let smallestDiff = Infinity;
+
+  for (const item of data) {
+    const itemDate = parseDate(item.date);
+
+    const diff = Math.abs(
+      itemDate.getTime() - targetDate.getTime()
+    );
+
+    if (diff < smallestDiff) {
+      smallestDiff = diff;
+
+      closest = item;
+    }
+  }
+
+  return parseFloat(closest.nav);
+}
+
 export async function GET() {
   try {
     const funds = [
       {
-        name: "Parag Parikh Flexi Cap",
+        name: "Parag Parikh Flexi Cap Direct Growth",
         code: "122639",
       },
       {
-        name: "Motilal Oswal Nasdaq 100",
+        name: "Motilal Oswal Nasdaq 100 FoF Direct Growth",
         code: "120503",
       },
       {
-        name: "Quant Small Cap",
+        name: "Quant Small Cap Direct Growth",
         code: "125354",
       },
       {
-        name: "Nippon India Small Cap",
+        name: "Nippon India Small Cap Direct Growth",
         code: "118989",
       },
       {
-        name: "HDFC Flexi Cap",
-        code: "118550",
+        name: "HDFC Flexi Cap Direct Growth",
+        code: "119114",
       },
       {
-        name: "ICICI Prudential Technology",
+        name: "ICICI Prudential Technology Direct Growth",
         code: "120586",
       },
     ];
@@ -44,24 +78,35 @@ export async function GET() {
 
         const navs = data.data;
 
-        const latest = parseFloat(navs[0].nav);
+        const latestNAV = parseFloat(navs[0].nav);
 
-        const week = parseFloat(navs[7]?.nav || navs[0].nav);
+        const oneWeekNAV = findClosestNAV(navs, 7);
 
-        const month = parseFloat(navs[30]?.nav || navs[0].nav);
+        const oneMonthNAV = findClosestNAV(navs, 30);
 
-        const threeMonth = parseFloat(navs[90]?.nav || navs[0].nav);
+        const threeMonthNAV = findClosestNAV(navs, 90);
 
         return {
           name: fund.name,
-          nav: latest.toFixed(2),
+
+          nav: latestNAV.toFixed(2),
+
           date: navs[0].date,
 
-          oneWeek: calculateReturn(latest, week),
+          oneWeek: calculateReturn(
+            latestNAV,
+            oneWeekNAV
+          ),
 
-          oneMonth: calculateReturn(latest, month),
+          oneMonth: calculateReturn(
+            latestNAV,
+            oneMonthNAV
+          ),
 
-          threeMonth: calculateReturn(latest, threeMonth),
+          threeMonth: calculateReturn(
+            latestNAV,
+            threeMonthNAV
+          ),
         };
       })
     );
